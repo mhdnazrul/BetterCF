@@ -16,31 +16,36 @@ const pluckVerdictOnNode = safe(n => {
 }, '');
 
 let ready = false;
+let originalShowMessage = null;
+let subChannel = null;
+let subCallback = null;
+
 export function init() {
     if (ready) return;
     ready = true;
 
     // Proxy Codeforces.showMessage to hide the test case
-    let _showMessage = env.global.Codeforces.showMessage;
+    originalShowMessage = env.global.Codeforces.showMessage;
 
     env.global.Codeforces.showMessage = function (message) {
         if (config.get('hideTestNumber')) {
             message = pluckVerdict(message);
         }
-        _showMessage(message);
+        originalShowMessage(message);
     };
 
     // Subscribe to Codeforces submisions pubsub
     if (env.global.submissionsEventCatcher) {
-        const channel = env.global.submissionsEventCatcher.channels[0];
-        env.global.submissionsEventCatcher.subscribe(channel, data => {
+        subChannel = env.global.submissionsEventCatcher.channels[0];
+        subCallback = data => {
             if (!config.get('hideTestNumber')) return;
 
             if (data.t === 's') {
                 const el = dom.$(`[data-a='${data.d[0]}'] .status-verdict-cell span`);
                 pluckVerdictOnNode(el);
             }
-        });
+        };
+        env.global.submissionsEventCatcher.subscribe(subChannel, subCallback);
     }
 }
 
@@ -57,6 +62,24 @@ export const install = env.ready(function() {
 });
 
 export function uninstall() {
+    // Allow re-initialization if re-enabled later
+    ready = false;
+
+    // Restore original showMessage
+    if (originalShowMessage) {
+        env.global.Codeforces.showMessage = originalShowMessage;
+        originalShowMessage = null;
+    }
+
+    // Unsubscribe from CF submissions pubsub
+    if (subCallback && env.global.submissionsEventCatcher) {
+        if (typeof env.global.submissionsEventCatcher.unsubscribe === 'function')
+            env.global.submissionsEventCatcher.unsubscribe(subChannel, subCallback);
+        subCallback = null;
+        subChannel = null;
+    }
+
+    // Remove CSS class and restore verdict text
     if (!document.documentElement.classList.contains('verdict-hide-number')) return;
     document.documentElement.classList.remove('verdict-hide-number');
 

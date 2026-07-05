@@ -48,16 +48,15 @@ window.addEventListener('message', e => {
     }
     else {
         // Send to the background to handle
-        e.data.to = Target.BACKGROUND;
-
         browser.runtime
-        .sendMessage(e.data)
+        .sendMessage({ ...e.data, to: Target.BACKGROUND })
         .then(response => window.postMessage(response, window.origin))
         .catch(err => log('[content] Error forwarding to background:', err))
     }
 });
 browser.runtime.onMessage.addListener(e => {
     log('[content] Got from bg', e);
+    if (e.to !== Target.INJECTED_SCRIPT) return;
     window.postMessage(e, window.origin);
 });
 

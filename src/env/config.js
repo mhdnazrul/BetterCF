@@ -105,7 +105,8 @@ function updateFromSync() {
             events.fire(key, patch[key]);
         });
     })
-    .then(save);
+    .then(save)
+    .catch(e => console.log('Error syncing config:', e));
 }
 
 /**

@@ -7,7 +7,7 @@ import dom from '../../helpers/dom';
 import env from '../../env/env';
 import * as config from '../../env/config';
 import * as events from '../../helpers/events';
-import { getStandingsPageContent, runScripts } from './common';
+import { getStandingsPageContent, runScripts } from '../../helpers/standings';
 import { once } from '../../helpers/Functional';
 import { EventName } from '../../helpers/constants';
 

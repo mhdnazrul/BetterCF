@@ -22,10 +22,11 @@ let mph = {
             let id = this.genID();
             message.id = id;
             message.to = Target.CONTENT_SCRIPT;
-            this.resolvers[id] = resolve;
+
+            const timeout = setTimeout(() => reject('Failed to get configuration: timeout'), 20000);
+            this.resolvers[id] = { resolve, timeout };
 
             window.postMessage(message, window.origin);
-            setTimeout(() => reject('Failed to get configuration: timeout'), 20000); // 20s timeout
         });
     },
 
@@ -40,7 +41,10 @@ let mph = {
                 return;
 
             if (e.data.type == MessageType.BG_RESULT) {
-                this.resolvers[e.data.id](e.data.result);
+                const entry = this.resolvers[e.data.id];
+                if (!entry) return;
+                clearTimeout(entry.timeout);
+                entry.resolve(e.data.result);
                 delete this.resolvers[e.data.id];
             }
             else if (e.data.type == MessageType.CONFIG_CHANGE) {

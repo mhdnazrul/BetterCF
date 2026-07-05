@@ -30,6 +30,8 @@ export function once(event, callback) {
 
 export async function fire(event, data) {
     const cbs = (listeners[event] || []).slice();
-    const results = cbs.map(async cb => cb(data));
+    const results = cbs.map(async cb => {
+        try { return await cb(data); } catch(e) {}
+    });
     return Promise.all(results);
 }

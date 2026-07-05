@@ -1,0 +1,212 @@
+# Release — Tag-Driven Publishing Pipeline
+#
+# Triggered by pushing a version tag matching v* (e.g., v2.4.2, v1.0.0-rc.1).
+# Validates the build, packages distributable archives for Chrome and Firefox,
+# and creates a GitHub Release with auto-generated release notes.
+#
+# The '@updateURL' and '@downloadURL' in userscript metadata point to
+# GitHub Release assets, so users receive updates automatically once
+# the release is published.
+#
+# ## Workflow
+#
+#   Validate ──► Package ──► Release
+#      │              │
+#   lint + build   zip archives    gh release create
+#   + test         + upload
+#
+# ## Future Extension Points
+#
+#   After the 'release' job, add:
+#   - publish-chrome:  upload dist/extension/ to Chrome Web Store
+#   - publish-firefox: upload dist/extension/ to Firefox Add-ons
+#   - notify:          send release notification to Discord / Slack
+#
+# ## Required Secrets (future)
+#
+#   CHROME_WEB_STORE_CLIENT_ID     — for CWS API (future)
+#   CHROME_WEB_STORE_CLIENT_SECRET — for CWS API (future)
+#   CHROME_WEB_STORE_REFRESH_TOKEN — for CWS API (future)
+#   FIREFOX_AMO_JWT_ISSUER         — for AMO API (future)
+#   FIREFOX_AMO_JWT_SECRET         — for AMO API (future)
+#   DISCORD_WEBHOOK_URL            — for release notifications (future)
+#
+# ==============================================================================
+
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+# Contents: write is required to create GitHub Releases and upload assets.
+# All other permissions default to 'none' under the fine-grained model.
+permissions:
+  contents: write
+
+# Unlike CI, release jobs should NOT be cancelled on concurrency —
+# two version tags pushed rapidly should both produce releases.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+
+  # --------------------------------------------------------------------------
+  # Validate — lint, build, and test the tagged commit
+  # --------------------------------------------------------------------------
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - name: Run unit tests
+        run: npm test
+        timeout-minutes: 2
+      - name: Extract version
+        id: version
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+
+  # --------------------------------------------------------------------------
+  # Package — create distributable ZIP archives
+  # --------------------------------------------------------------------------
+  package:
+    name: Package
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+      - name: Package Chrome extension
+        run: |
+          mkdir -p artifacts
+          cd dist/extension
+          zip -r ../../artifacts/bettercf-chrome.zip .
+          cd ../..
+
+      - name: Package Firefox extension
+        run: |
+          # Currently identical to Chrome (Manifest V2, polyfill handles API differences).
+          # When Firefox-specific manifest keys are added (e.g. browser_specific_settings),
+          # this step should produce a separate build. For now, share the same artifact.
+          cp artifacts/bettercf-chrome.zip artifacts/bettercf-firefox.zip
+
+      - name: Package userscript
+        run: |
+          cp dist/userscript/script.user.js artifacts/bettercf.user.js
+          cp dist/userscript/script.meta.js artifacts/bettercf.meta.js
+
+      - name: List artifacts
+        run: ls -lh artifacts/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: artifacts/
+          if-no-files-found: error
+
+  # --------------------------------------------------------------------------
+  # Release — create GitHub Release and upload artifacts
+  #
+  # Uses the pre-installed `gh` CLI (no third-party actions required).
+  # GitHub auto-generates release notes from commits between the last tag
+  # and this one.
+  # --------------------------------------------------------------------------
+  release:
+    name: Release
+    needs: package
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts
+          path: artifacts/
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --generate-notes \
+            artifacts/bettercf-chrome.zip \
+            artifacts/bettercf-firefox.zip \
+            artifacts/bettercf.user.js \
+            artifacts/bettercf.meta.js
+
+      - name: Verify release
+        run: |
+          echo "Release $TAG created successfully."
+          gh release view "$TAG" --json tagName,assets
+
+  # ==========================================================================
+  # Future jobs (uncomment and add secrets when ready)
+  # ==========================================================================
+
+  # publish-chrome:
+  #   name: Publish to Chrome Web Store
+  #   needs: release
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/download-artifact@v4
+  #       with:
+  #         name: release-artifacts
+  #         path: artifacts/
+  #     - uses: mobilefirstllc/cws-publish@v2
+  #       with:
+  #         extension_id: ${{ vars.CHROME_EXTENSION_ID }}
+  #         client_id: ${{ secrets.CHROME_WEB_STORE_CLIENT_ID }}
+  #         client_secret: ${{ secrets.CHROME_WEB_STORE_CLIENT_SECRET }}
+  #         refresh_token: ${{ secrets.CHROME_WEB_STORE_REFRESH_TOKEN }}
+  #         zip_file: artifacts/bettercf-chrome.zip
+
+  # publish-firefox:
+  #   name: Publish to Firefox Add-ons
+  #   needs: release
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/download-artifact@v4
+  #       with:
+  #         name: release-artifacts
+  #         path: artifacts/
+  #     - uses: tophat-cc/sign-addon@v2
+  #       with:
+  #         extension_id: ${{ vars.FIREFOX_EXTENSION_ID }}
+  #         jwt_issuer: ${{ secrets.FIREFOX_AMO_JWT_ISSUER }}
+  #         jwt_secret: ${{ secrets.FIREFOX_AMO_JWT_SECRET }}
+  #         artifacts: artifacts/bettercf-firefox.zip
+
+  # notify:
+  #   name: Notify
+  #   needs: release
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/download-artifact@v4
+  #       with:
+  #         name: release-artifacts
+  #         path: artifacts/
+  #     - uses: Ilshidur/action-discord@master
+  #       with:
+  #         args: "BetterCF ${{ github.ref_name }} released! {{ SEVERAL_NOTABLE_CHANGES }}"
+  #       env:
+  #         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}

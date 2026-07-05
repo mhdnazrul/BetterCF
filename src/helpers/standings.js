@@ -1,6 +1,6 @@
 // This is actually a helper file!
 
-import dom from '../../helpers/dom';
+import dom from './dom';
 
 const includesAny = (patterns, text) =>
     patterns.some(p => text.includes(p))

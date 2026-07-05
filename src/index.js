@@ -36,8 +36,8 @@ profile(run);
 async function run() {
     console.log("BetterCF is running!");
 
-    config.load();
-    config.createUI();
+    tryCatch(config.load, e => console.log('Error loading configuration:', e)) ();
+    tryCatch(config.createUI, e => console.log('Error creating config UI:', e)) ();
 
     let modules = [
         [style              , 'style'],
@@ -86,10 +86,10 @@ async function run() {
         }
     });
 
-    style.common();
-    finder.updateGroups();
+    tryCatch(() => { style.common(); }, e => console.log('Error injecting common styles:', e)) ();
+    tryCatch(() => { finder.updateGroups(); }, e => console.log('Error updating groups:', e)) ();
 
-    env.run_when_ready(function() {
+    env.run_when_ready(tryCatch(function() {
         const v = config.get('version');
         if (v != env.version) {
             config.set('version', env.version);
@@ -97,5 +97,5 @@ async function run() {
             Read the <a href="https://github.com/anomalyco/BetterCF/releases/latest" style="text-decoration:underline !important;color:white;">
             changelog</a>`);
         }
-    });
+    }, e => console.log('Error during version check:', e)));
 }

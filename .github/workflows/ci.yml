@@ -1,3 +1,11 @@
+# CI — Push and Pull Request Validation
+#
+# Runs on every push to main and every pull request targeting main.
+# Executes lint, build (multi-version matrix), and unit tests in parallel
+# where possible. Uploads build artifacts for downstream debugging.
+#
+# Permissions: read-only (contents + pull-requests)
+
 name: CI
 
 on:
@@ -6,14 +14,45 @@ on:
   pull_request:
     branches: [main]
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+
+  # ---------------------------------------------------------------------------
+  # Lint — runs ESLint against src/ and test/
+  # Fastest job; intentionally separate from build for parallel execution.
+  # ---------------------------------------------------------------------------
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+
+  # ---------------------------------------------------------------------------
+  # Build — produces dist/ across three Node.js LTS releases
+  # Matrix ensures no version-specific breakage.
+  # Artifact uploaded for the test job and for manual inspection.
+  # ---------------------------------------------------------------------------
+  build:
+    name: Build (Node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     strategy:
       matrix:
         node-version: [18, 20, 22]
-
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,16 +61,22 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: npm run lint
-      - name: Upload dist artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: bettercf-dist-node-${{ matrix.node-version }}
+          name: dist-node-${{ matrix.node-version }}
           path: dist/
+          if-no-files-found: error
 
+  # ---------------------------------------------------------------------------
+  # Test — unit tests (tape)
+  # Rebuilds from source to ensure test/bundle.js is fresh.
+  # Depends on build to ensure the main build passed first.
+  # ---------------------------------------------------------------------------
   test:
-    runs-on: ubuntu-latest
+    name: Test
     needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -40,8 +85,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - name: Build test bundle
-        run: npx rollup -c test/index.js --environment NODE_ENV:test
       - name: Run unit tests
-        run: node test/bundle.js
+        run: npm test
         timeout-minutes: 2
