@@ -85,6 +85,12 @@ jobs:
           cache: npm
       - run: npm ci --legacy-peer-deps
       - run: npm run build
+      - name: Setup Chrome for Puppeteer tests
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq chromium-browser xvfb
       - name: Run unit tests
-        run: npm test
-        timeout-minutes: 2
+        run: xvfb-run --auto-servernum npm test
+        timeout-minutes: 5
+        env:
+          PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium-browser
