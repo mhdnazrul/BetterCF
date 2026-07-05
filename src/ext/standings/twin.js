@@ -9,6 +9,7 @@ import * as config from '../../env/config';
 import * as events from '../../helpers/events';
 import { getStandingsPageContent, runScripts } from './common';
 import { once } from '../../helpers/Functional';
+import { EventName } from '../../helpers/constants';
 
 // Returns a bunch of information about the current contest
 function gatherInfo() {
@@ -67,7 +68,7 @@ export const update = env.ready(function() {
 });
 
 const listenToStandingsUpdates = once(() =>
-    events.listen('standings updated', update) // If the main standings updated, we should too
+    events.listen(EventName.STANDINGS_UPDATED, update) // If the main standings updated, we should too
 );
 
 export const install = env.ready(async function() {

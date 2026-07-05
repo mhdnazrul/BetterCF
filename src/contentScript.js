@@ -1,22 +1,24 @@
+import { MessageType, Target } from './helpers/constants';
+
 const log = process.env.NODE_ENV === 'development'
             ? console.log
             : function(){};
 
 function success(id, result) {
     window.postMessage({
-        type: 'bg result',
+        type: MessageType.BG_RESULT,
         id: id,
         result: result,
-        to: 'is',
+        to: Target.INJECTED_SCRIPT,
     }, window.origin);
 }
 
 function failure(id, error) {
     window.postMessage({
-        type: 'error',
+        type: MessageType.ERROR,
         id: id,
         error: error,
-        to: 'is',
+        to: Target.INJECTED_SCRIPT,
     }, window.origin);
 }
 
@@ -26,19 +28,19 @@ function failure(id, error) {
 window.addEventListener('message', e => {
     log('[content] Got', e.data);
 
-    if (e.origin != window.origin || e.data.to != 'cs')
+    if (e.origin != window.origin || e.data.to != Target.CONTENT_SCRIPT)
         return;
 
     const id = e.data.id;
 
     // TODO: error handling for the promises
-    if (e.data.type == 'get storage') {
+    if (e.data.type == MessageType.GET_STORAGE) {
         browser.storage.sync
         .get([e.data.key])
         .then(result => success(id, result))
         .catch(err => failure(id, err));
     }
-    else if (e.data.type == 'set storage') {
+    else if (e.data.type == MessageType.SET_STORAGE) {
         browser.storage.sync
         .set({ [e.data.key]: e.data.value })
         .then(result => success(id, result))
@@ -46,11 +48,12 @@ window.addEventListener('message', e => {
     }
     else {
         // Send to the background to handle
-        e.data.to = 'bg';
+        e.data.to = Target.BACKGROUND;
 
         browser.runtime
         .sendMessage(e.data)
         .then(response => window.postMessage(response, window.origin))
+        .catch(err => log('[content] Error forwarding to background:', err))
     }
 });
 browser.runtime.onMessage.addListener(e => {

@@ -9,13 +9,14 @@ import { safe } from '../helpers/Functional';
 import * as events from '../helpers/events';
 import env from './env';
 import { Config, Shortcuts } from './config_ui';
+import { STORAGE_KEY, EventName } from '../helpers/constants';
 
 let config = {};
 
 export function save() {
-    localStorage.bettercf = JSON.stringify(config);
+    localStorage[STORAGE_KEY] = JSON.stringify(config);
     if (process.env.TARGET == 'extension') {
-        env.storage.set('bettercf', config);
+        env.storage.set(STORAGE_KEY, config);
     }
 }
 export function commit(id) {
@@ -78,7 +79,7 @@ export function load() {
     }
 
     // Listen to requests for the config to change. Can come from the MPH, for example (env-extension.js)
-    events.listen('request config change', ({ id, value }) => {
+    events.listen(EventName.REQUEST_CONFIG_CHANGE, ({ id, value }) => {
         config[id] = value;
         events.fire(id, value);
         // no save(), commit() or set() to prevent infinite loops
@@ -96,7 +97,7 @@ const keysToPatch = (obj={}, patch={}) =>
 
 function updateFromSync() {
     return env.storage
-    .get('bettercf')
+    .get(STORAGE_KEY)
     .then(patch => {
         keysToPatch(config, patch)
         .forEach(key => {

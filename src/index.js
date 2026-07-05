@@ -62,15 +62,20 @@ async function run() {
                         'show_tutorial', 'navbar', 'redirector', 'update_standings', 'twin_standings',
                         'verdict_test', 'shortcuts', 'sidebar', 'mashup', 'change_page_title' ];
 
+    const configCallbacks = new Map();
     function registerConfigCallback(m, id) {
-        events.listen(id, value => {
+        const prev = configCallbacks.get(id);
+        if (prev) events.removeListener(id, prev);
+        const cb = value => {
             if (value === true || value === false) {
                 value ? m.install() : (m.uninstall || nop)();
             } else {
                 (m.uninstall || nop)();
                 m.install(value);
             }
-        });
+        };
+        configCallbacks.set(id, cb);
+        events.listen(id, cb);
     }
 
     modules.forEach(([m, configID], index) => {

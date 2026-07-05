@@ -3,6 +3,7 @@ import * as events from './helpers/events';
 import { Config, Shortcuts } from './env/config_ui';
 import { defaultConfig } from './env/config';
 import { sendChangeToInjected } from './helpers/tabMessaging';
+import { STORAGE_KEY } from './helpers/constants';
 
 let config;
 
@@ -11,14 +12,14 @@ function pushChange(id, value) {
     config[id] = value;
     events.fire(id, value);
     sendChangeToInjected(id, value);
-    browser.storage.sync.set({ bettercf: config });
+    browser.storage.sync.set({ [STORAGE_KEY]: config });
 }
  
 function pushShortcut(id, value) {
     console.log(`shortcut #${id} changed to ${value}. Notifying clients.`);
     config.shortcuts[id] = value;
     sendChangeToInjected('shortcuts', config.shortcuts);
-    browser.storage.sync.set({ bettercf: config });
+    browser.storage.sync.set({ [STORAGE_KEY]: config });
 }
 
 events.listen('darkTheme', on => {
@@ -26,8 +27,8 @@ events.listen('darkTheme', on => {
 });
 
 (async function() {
-    config = await browser.storage.sync.get(['bettercf']);
-    config = config.bettercf;
+    config = await browser.storage.sync.get([STORAGE_KEY]);
+    config = config[STORAGE_KEY];
     config = Object.assign({}, defaultConfig, config);
 
     if (config.darkTheme)

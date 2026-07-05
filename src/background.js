@@ -1,13 +1,14 @@
 import { sendChangeToInjected } from './helpers/tabMessaging';
+import { MessageType, Target } from './helpers/constants';
 
 browser.runtime.onMessage.addListener(data => {
     console.log('Got message', data);
 
-    if (data.to !== 'bg') return false;
+    if (data.to !== Target.BACKGROUND) return false;
 
-    if (data.type == 'propagate config') {
+    if (data.type == MessageType.PROPAGATE_CONFIG) {
         sendChangeToInjected(data.key, data.value);
-        return Promise.resolve({ id: data.id, to: 'is', type: 'bg result' });
+        return Promise.resolve({ id: data.id, to: Target.INJECTED_SCRIPT, type: MessageType.BG_RESULT });
     }
 
 });

@@ -3,6 +3,7 @@
 
 import { pluck, nop } from '../helpers/Functional';
 import * as events from '../helpers/events';
+import { MessageType, Target, EventName } from '../helpers/constants';
 
 export const global = process.env.TARGET == 'extension' && window;
 
@@ -20,10 +21,10 @@ let mph = {
         return new Promise((resolve, reject) => {
             let id = this.genID();
             message.id = id;
-            message.to = 'cs';
+            message.to = Target.CONTENT_SCRIPT;
             this.resolvers[id] = resolve;
 
-            window.postMessage(message, '*');
+            window.postMessage(message, window.origin);
             setTimeout(() => reject('Failed to get configuration: timeout'), 20000); // 20s timeout
         });
     },
@@ -35,23 +36,23 @@ let mph = {
 
         window.addEventListener('message', e => {
             log("[mph] Got", e.data);
-            if (e.origin !== window.origin || e.data.to != 'is')
+            if (e.origin !== window.origin || e.data.to != Target.INJECTED_SCRIPT)
                 return;
 
-            if (e.data.type == 'bg result') {
+            if (e.data.type == MessageType.BG_RESULT) {
                 this.resolvers[e.data.id](e.data.result);
                 delete this.resolvers[e.data.id];
             }
-            else if (e.data.type == 'config change') {
-                events.fire('request config change', { id: e.data.id, value: e.data.value });
+            else if (e.data.type == MessageType.CONFIG_CHANGE) {
+                events.fire(EventName.REQUEST_CONFIG_CHANGE, { id: e.data.id, value: e.data.value });
             }
         });
     }
 };
 
 export const storage = {
-    get: key => mph.send({ type: 'get storage', key })
+    get: key => mph.send({ type: MessageType.GET_STORAGE, key })
                 .then (pluck(key)),
-    set: (key, value) => mph.send({ type: 'set storage', key, value }),
-    propagate: (key, value) => mph.send({ type: 'propagate config', key, value }),
+    set: (key, value) => mph.send({ type: MessageType.SET_STORAGE, key, value }),
+    propagate: (key, value) => mph.send({ type: MessageType.PROPAGATE_CONFIG, key, value }),
 };

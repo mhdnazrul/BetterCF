@@ -7,6 +7,7 @@ import env from '../../env/env';
 import * as config from '../../env/config';
 import * as events from '../../helpers/events';
 import { getStandingsPageContent, runScripts } from './common';
+import { EventName } from '../../helpers/constants';
 
 // FIXME: cf-predictor deltas dissapear after reloading standings
 
@@ -22,7 +23,7 @@ function update() {
         }))
         .catch(err => console.error("Couldn't load the standings. Reason: ", err));
 
-    const evt = events.fire('standings updated');
+    const evt = events.fire(EventName.STANDINGS_UPDATED);
 
     // After everything has been updated, run the scripts
     Promise.all([ upd, evt ])

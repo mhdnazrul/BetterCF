@@ -2,17 +2,34 @@
  * @file Minimalistic event-bus
  */
 
-let listeners = {};
+const listeners = {};
 
 export function listen(event, callback) {
     if (!listeners[event])
         listeners[event] = [];
+    if (listeners[event].includes(callback))
+        return;
     listeners[event].push(callback);
 }
 
-export async function fire(event, data) {
-    const results = (listeners[event] || [])
-                        .map(async cb => cb(data));
+export function removeListener(event, callback) {
+    const cbs = listeners[event];
+    if (!cbs) return;
+    const idx = cbs.indexOf(callback);
+    if (idx === -1) return;
+    cbs.splice(idx, 1);
+}
 
+export function once(event, callback) {
+    const wrapper = (...args) => {
+        removeListener(event, wrapper);
+        return callback(...args);
+    };
+    listen(event, wrapper);
+}
+
+export async function fire(event, data) {
+    const cbs = (listeners[event] || []).slice();
+    const results = cbs.map(async cb => cb(data));
     return Promise.all(results);
 }
