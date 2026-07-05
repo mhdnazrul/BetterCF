@@ -6,6 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>BetterCF Settings</title>
 
+    <link rel="stylesheet" href="common.css">
+
     <style>
         body {
             margin: 0;
@@ -22,19 +24,6 @@
         #ui {
             font-size: 1.15em;
         }
-        #ui>label {
-            position: relative;
-            margin-bottom: 0.5em;
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-        }
-        #ui input[type=text], #ui input[type=number] {
-            width: 32%;
-        }
-        #ui input[type=checkbox] {
-            visibility: hidden;
-        }
         #ui .toggle>span {
             position: absolute;
             width: 0.9rem;
@@ -46,22 +35,6 @@
             border-radius: 100%;
             background: #eee;
             transition: background 0.2s;
-        }
-        #ui .toggle>input:checked + span {
-            background: #188ecd;
-        }
-        #ui .toggle>span:before {
-            content: "✓";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #eee;
-            font-size: 0.8em;
-        }
-
-        label {
-            user-select: none;
         }
 
         #logo {

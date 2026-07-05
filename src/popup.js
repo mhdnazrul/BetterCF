@@ -2,24 +2,9 @@ import dom from './helpers/dom';
 import * as events from './helpers/events';
 import { Config, Shortcuts } from './env/config_ui';
 import { defaultConfig } from './env/config';
+import { sendChangeToInjected } from './helpers/tabMessaging';
 
 let config;
-
-function sendChangeToInjected(id, value) {
-    // Forward config change to all Codeforces tabs via their content scripts
-    function send(tab) {
-        browser.tabs.sendMessage(tab.id, {
-            type: 'config change',
-            to: 'is',
-            id,
-            value,
-        });
-    }
-
-    browser.tabs
-    .query({ url: '*://codeforces.com/*' })
-    .then(tabs => tabs.forEach(send));
-}
 
 function pushChange(id, value) {
     console.log(`#${id} changed to ${value}. Notifying clients.`);

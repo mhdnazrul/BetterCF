@@ -36,7 +36,7 @@
     animation: fadeIn 0.15s forwards;
 }
 html.bettercf-dark-mode .bettercf-modal-background { background: #ffffff87; }
-.bettercf-modal-inner>label {
+.bettercf-modal-inner>label, #ui>label {
     position: relative;
     margin-bottom: 0.5em;
     display: flex;
@@ -44,10 +44,12 @@ html.bettercf-dark-mode .bettercf-modal-background { background: #ffffff87; }
     justify-content: space-between;
     user-select: none;
 }
-.bettercf-modal-inner input[type=text], .bettercf-modal-inner input[type=number] {
+.bettercf-modal-inner input[type=text], .bettercf-modal-inner input[type=number],
+#ui input[type=text], #ui input[type=number] {
     width: 32%;
 }
-.bettercf-modal-inner input[type=checkbox] {
+.bettercf-modal-inner input[type=checkbox],
+#ui input[type=checkbox] {
     visibility: hidden;
 }
 .bettercf-modal-inner .toggle>span {
@@ -62,10 +64,12 @@ html.bettercf-dark-mode .bettercf-modal-background { background: #ffffff87; }
     background: #eee;
     transition: background 0.2s;
 }
-.bettercf-modal-inner .toggle>input:checked + span {
+.bettercf-modal-inner .toggle>input:checked + span,
+#ui .toggle>input:checked + span {
     background: #188ecd;
 }
-.bettercf-modal-inner .toggle>span:before {
+.bettercf-modal-inner .toggle>span:before,
+#ui .toggle>span:before {
     content: "✓";
     position: absolute;
     top: 50%;
