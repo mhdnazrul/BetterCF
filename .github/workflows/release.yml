@@ -117,6 +117,8 @@ jobs:
 
       - name: Package userscript
         run: |
+          ls -la dist/userscript/
+          mkdir -p artifacts
           cp dist/userscript/script.user.js artifacts/bettercf.user.js
           cp dist/userscript/script.meta.js artifacts/bettercf.meta.js
 
