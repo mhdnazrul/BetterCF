@@ -1,4 +1,4 @@
-# OS / editor artifacts
+# --- OS / editor artifacts ---
 .vscode/
 .idea/
 *.swp
@@ -6,21 +6,39 @@
 *~
 .DS_Store
 Thumbs.db
+Desktop.ini
 
-# Build / cache / output
+# --- Project lock (npm only) ---
+yarn.lock
+pnpm-lock.yaml
+
+# --- Build / cache / output ---
 .cache/
 node_modules/
 dist/
 test/bundle.js
+*.tsbuildinfo
 
-# Environment
+# --- Release artifacts ---
+*.zip
+artifacts/
+
+# --- Test coverage ---
+coverage/
+.nyc_output/
+
+# --- Environment ---
 .env
 .env.local
 .env.*.local
 
-# Logs
+# --- Logs ---
 *.log
 npm-debug.log*
 
-# ESLint cache
+# --- Linter / formatter cache ---
 .eslintcache
+.prettiercache
+
+# --- Rollup / bundler ---
+.crunch/

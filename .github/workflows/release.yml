@@ -68,7 +68,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
       - run: npm run lint
       - run: npm run build
       - name: Run unit tests
@@ -92,7 +92,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - run: npm ci --legacy-peer-deps
       - run: npm run build
 
       - name: Package Chrome extension
@@ -155,6 +155,8 @@ jobs:
             artifacts/bettercf.meta.js
 
       - name: Verify release
+        env:
+          TAG: ${{ github.ref_name }}
         run: |
           echo "Release $TAG created successfully."
           gh release view "$TAG" --json tagName,assets
