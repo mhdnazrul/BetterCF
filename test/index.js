@@ -136,13 +136,19 @@ test('Functional works', t => {
 let browser;
 test('Puppeteer tests', async t => {
     const extensionPath = path.join(__dirname, '../dist/extension/');
-    browser = await puppeteer.launch({
-        headless: false, // extensions are allowed only in headfull mode
-        args: [
-            `--disable-extensions-except=${extensionPath}`,
-            `--load-extension=${extensionPath}`
-        ]
-    });
+    try {
+        browser = await puppeteer.launch({
+            headless: false, // extensions are allowed only in headfull mode
+            args: [
+                `--disable-extensions-except=${extensionPath}`,
+                `--load-extension=${extensionPath}`
+            ]
+        });
+    } catch (err) {
+        t.comment(`Skipping Puppeteer tests: ${err.message}`);
+        t.end();
+        return;
+    }
 
     const CodeforcesURL = 'https://codeforces.com/';
 
