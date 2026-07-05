@@ -1,0 +1,64 @@
+{
+  "name": "bettercf",
+  "version": "2.4.1",
+  "description": "BetterCF — Codeforces enhancement suite for competitive programmers.",
+  "main": "src/index.js",
+  "author": "mhdnazrul <mhdnazrul511@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "homepage": "https://github.com/mhdnazrul/BetterCF#readme",
+  "bugs": {
+    "url": "https://github.com/mhdnazrul/BetterCF/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mhdnazrul/BetterCF.git"
+  },
+  "keywords": [
+    "codeforces",
+    "competitive-programming",
+    "browser-extension",
+    "chrome-extension",
+    "firefox-addon",
+    "userscript",
+    "bettercf"
+  ],
+  "scripts": {
+    "start": "rollup -c -w --environment NODE_ENV:development",
+    "build": "rollup -c --environment NODE_ENV:production",
+    "build:dev": "rollup -c --environment NODE_ENV:development",
+    "clean": "rm -r dist/",
+    "test": "node test/bundle.js",
+    "zip": "7z a dist/bundle.zip ./dist/extension/*",
+    "lint": "eslint src/ test/",
+    "format": "prettier --write \"src/**/*.js\" \"test/**/*.js\" \"src/popup.html\"",
+    "format:check": "prettier --check \"src/**/*.js\" \"test/**/*.js\" \"src/popup.html\""
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0-0",
+    "@babel/preset-react": "^7.6.3",
+    "@eslint/js": "^10.0.1",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "eslint": "^10.6.0",
+    "globals": "^17.7.0",
+    "hjson": "^3.2.1",
+    "prettier": "^3.9.4",
+    "puppeteer": "^2.1.1",
+    "rollup": "^1.29.0",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-copy": "^3.2.1",
+    "rollup-plugin-inject-process-env": "^1.1.0",
+    "rollup-plugin-terser": "^5.2.0",
+    "serialize-javascript": "^3.1.0",
+    "tap-diff": "^0.1.1",
+    "tape": "^4.11.0"
+  },
+  "dependencies": {
+    "acorn": "^7.1.1",
+    "diff": "^3.5.0",
+    "minimist": "^1.2.3",
+    "rollup-plugin-import-css": "^2.0.0",
+    "webextension-polyfill": "^0.6.0"
+  }
+}

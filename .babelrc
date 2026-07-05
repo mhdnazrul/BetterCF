@@ -1,0 +1,16 @@
+{
+    "presets": [
+      ["env", {
+        "targets": {
+          "browsers": ["last 5 Chrome versions"]
+        },
+        "modules": false
+      }],
+      ["@babel/preset-react",
+        {
+          "pragma": "dom.element",
+          "pragmaFrag": "dom.fragment"
+        }
+      ]
+    ]
+  }

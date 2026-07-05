@@ -1,0 +1,16 @@
+# Normalize line endings to LF for all text files
+* text=auto eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.zip binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+
+# Generated outputs - don't diff
+dist/** linguist-generated
+test/bundle.js linguist-generated

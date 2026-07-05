@@ -1,4 +1,26 @@
-.vscode
-.cache
+# OS / editor artifacts
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Build / cache / output
+.cache/
 node_modules/
 dist/
+test/bundle.js
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# ESLint cache
+.eslintcache
