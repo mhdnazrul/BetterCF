@@ -4,8 +4,14 @@
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 2.x     | ✅                 |
-| < 2.0   | ❌                 |
+| 1.x     | ✅                 |
+| < 1.0   | ❌                 |
+
+## Release Cycle
+
+- **Latest**: v1.0.0
+- **Maintenance**: Latest version receives security patches
+- **EOL Policy**: Previous minor versions supported for 3 months after next release
 
 ## Reporting a Vulnerability
 

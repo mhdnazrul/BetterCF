@@ -61,8 +61,8 @@ All code must pass `npm run lint` before merging. Prettier formatting is checked
 src/
   env/          — Environment and configuration
   helpers/      — Shared utilities (DOM, events, functional)
-  modules/      — Feature modules (each exports install/uninstall/init/update)
-popup/          — Extension popup UI
+  ext/          — Feature modules (each exports install/uninstall lifecycle)
+popup.html      — Extension popup UI
 docs/           — Documentation
 test/           — Tests (tape + puppeteer)
 dist/           — Build output (generated)

@@ -1,9 +1,9 @@
 # BetterCF — Technical Documentation
 
-**Repository**: [github.com/anomalyco/BetterCF](https://github.com/anomalyco/BetterCF)  
+**Repository**: [github.com/mhdnazrul/BetterCF](https://github.com/mhdnazrul/BetterCF)  
 
-**Forked from**: [github.com/LeoRiether/CodeforcesPP](https://github.com/LeoRiether/CodeforcesPP) by Leonardo Riether
-**Version**: 2.4.1  
+**Forked from**: [github.com/LeoRiether/CodeforcesPP](https://github.com/LeoRiether/CodeforcesPP) by Leonardo Riether  
+**Version**: 1.0.0  
 **Build System**: Rollup + Babel  
 **Targets**: Chrome Extension (MV2), Firefox Extension (MV2), Userscript (Tampermonkey/Violentmonkey/Greasemonkey)
 

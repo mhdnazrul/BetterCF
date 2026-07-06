@@ -5,6 +5,20 @@ All notable changes to BetterCF will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] — 2026-07-06
+
+### Added
+- **First public stable release** of BetterCF.
+- Complete rebranding from CodeforcesPP to BetterCF.
+- Comprehensive technical documentation (13 docs covering architecture, development guides, and specifications).
+- Professional open-source repository structure with CI/CD pipelines.
+- GitHub community files: CONTRIBUTING.md, CODE_OF_CONDUCT.md, SECURITY.md, SUPPORT.md.
+- Dual-target build: Chrome/Firefox extensions (Manifest v2) and userscript (Tampermonkey/Violentmonkey/Greasemonkey).
+- 15+ features including dark mode, navigation enhancements, shortcuts, standings auto-refresh, problem finder, and more.
+
+### Changed
+- Rebranded all user-facing assets and internal identifiers from CodeforcesPP to BetterCF.
+
 ## [2.4.1] — 2026-07-05
 
 ### Changed
