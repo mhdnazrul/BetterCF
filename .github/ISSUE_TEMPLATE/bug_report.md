@@ -25,7 +25,7 @@ If applicable, add screenshots to help explain your problem.
 
  **Details:**
  - Which browser:  [e.g. Chrome, Firefox]
- - BetterCF version: [e.g. v2.4.1]
+ - BetterCF version: [e.g. v1.0.0]
  - I am using the
    - [ ] Browser Extension
    - [ ] Userscript
