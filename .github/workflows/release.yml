@@ -105,15 +105,14 @@ jobs:
         run: |
           mkdir -p artifacts
           cd dist/extension
-          zip -r ../../artifacts/bettercf-chrome.zip .
+          zip -r ../../artifacts/bettercf-chrome-mv3.zip .
           cd ../..
 
       - name: Package Firefox extension
         run: |
-          # Currently identical to Chrome (Manifest V2, polyfill handles API differences).
-          # When Firefox-specific manifest keys are added (e.g. browser_specific_settings),
-          # this step should produce a separate build. For now, share the same artifact.
-          cp artifacts/bettercf-chrome.zip artifacts/bettercf-firefox.zip
+          # Firefox continues to use MV2 (separate build or branch)
+          # For now, skip Firefox packaging in this MV3 pipeline
+          echo "Firefox MV2 packaging handled by separate workflow"
 
       - name: Package userscript
         run: |
@@ -168,8 +167,7 @@ jobs:
           gh release create "$TAG" \
             --title "$TAG" \
             --generate-notes \
-            artifacts/bettercf-chrome.zip \
-            artifacts/bettercf-firefox.zip \
+            artifacts/bettercf-chrome-mv3.zip \
             artifacts/bettercf.user.js \
             artifacts/bettercf.meta.js
 
