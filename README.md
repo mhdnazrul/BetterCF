@@ -50,6 +50,9 @@ BetterCF is available both as a browser extension and as a userscript, you can i
 
 ## Extension
 
+**Chrome/Chromium (v2.0.0+): Manifest V3**  
+The latest versions use Manifest V3, which is required by Chrome Web Store. Service workers handle background tasks instead of persistent background pages.
+
 This version offers the most functionality.
 
 Some features the extension has, but the userscript can't provide:

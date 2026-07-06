@@ -5,6 +5,29 @@ All notable changes to BetterCF will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] — 2026-07-06
+
+### Changed
+- **BREAKING**: Migrated extension from Manifest V2 to Manifest V3
+- Background scripts now use Service Workers instead of persistent background pages
+- Updated permissions structure (separated `permissions` and `host_permissions`)
+- Updated extension icon handling (now in `action` instead of `browser_action`)
+- Web accessible resources now use explicit URL patterns for enhanced security
+
+### Added
+- Full Manifest V3 support for Chrome and Chromium-based browsers
+- Improved performance with service worker architecture
+- Stricter security policies aligned with Chrome Web Store requirements
+
+### Fixed
+- Chrome Web Store compliance for MV3 requirements
+- Security improvements through explicit resource matching
+
+### Notes
+- Firefox support continues on v1.x branch with Manifest V2
+- All 15 features fully functional in MV3
+- Userscript build unaffected by this migration
+
 ## [1.0.0] — 2026-07-06
 
 ### Added
