@@ -24,6 +24,9 @@ function copyManifest(from, to) {
 function copyMeta(to) {
     return {
         async buildEnd() {
+            const path = require('path');
+            const dir = path.dirname(to);
+            fs.mkdirSync(dir, { recursive: true });
             fs.writeFile(to, meta, Function());
         },
 
