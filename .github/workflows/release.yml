@@ -150,6 +150,16 @@ jobs:
           name: release-artifacts
           path: artifacts/
 
+      - name: Delete existing release if present
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" &>/dev/null; then
+            echo "Deleting existing release $TAG"
+            gh release delete "$TAG" --yes
+          fi
+
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
