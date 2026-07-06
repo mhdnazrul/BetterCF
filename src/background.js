@@ -1,3 +1,10 @@
+/**
+ * @file Background service worker for MV3
+ * Handles message passing between content scripts and the extension
+ */
+
+import browser from 'webextension-polyfill';
+
 import { sendChangeToInjected } from './helpers/tabMessaging';
 import { MessageType, Target } from './helpers/constants';
 
